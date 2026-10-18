@@ -65,7 +65,10 @@ async def observe_requests(request: Request, call_next):
         recent_logs.append(entry)
         logger.info(json.dumps(entry))
 
-
+@app.get("/")
+async def root():
+    return {"status": "ok", "message": "Observability service is running"}
+    
 @app.get("/work")
 async def work(n: int = Query(default=1, ge=0, le=100000)):
     # Simulate K units of work.
