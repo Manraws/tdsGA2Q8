@@ -21,7 +21,6 @@ REQUEST_COUNTER = Counter(
     "Total number of HTTP requests",
     ["method", "path"],
 )
-
 # Keep recent log entries available for the tail endpoint.
 recent_logs = deque(maxlen=1000)
 
@@ -47,9 +46,12 @@ async def observe_requests(request: Request, call_next):
         status_code = response.status_code
         response.headers["X-Request-ID"] = request_id
         return response
-    finally:
-        REQUEST_COUNTER.labels(method=method, path=path).inc()
-
+    finally
+        REQUEST_COUNTER.labels(
+            method=request.method,
+            path=request.url.path,
+        ).inc()
+        
         entry = {
             "level": "INFO",
             "ts": datetime.now(timezone.utc).isoformat(),
@@ -81,14 +83,13 @@ async def work(n: int = Query(default=1, ge=0, le=100000)):
         "done": n,
     }
 
-
 @app.get("/metrics")
 async def metrics():
     return Response(
         content=generate_latest(),
         media_type=CONTENT_TYPE_LATEST,
     )
-
+     
 
 @app.get("/healthz")
 async def healthz():
