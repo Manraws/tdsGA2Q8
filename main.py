@@ -46,7 +46,7 @@ async def observe_requests(request: Request, call_next):
         status_code = response.status_code
         response.headers["X-Request-ID"] = request_id
         return response
-    finally
+    finally:
         REQUEST_COUNTER.labels(
             method=request.method,
             path=request.url.path,
